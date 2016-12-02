@@ -1,0 +1,404 @@
+// copy
+// open new sketch in arduino
+//delete all text in arduino window
+// verify
+//upload
+/* this sketch is designed for the arduino pro micro
+sketch to be compatible with all devices that have keyboard compatibility
+this sketch was created/altered and/or designed
+by Carlos Reyes
+with help from the arduino community and libraries
+on oct 2016
+for the purpose of DIY project builds on my youtube channel
+sequential shifter and e-brake with buttons and led’s
+metadata is still in progress so search
+2727clos, carlos reyes, clos2727, clos reyes, or game on
+email clos2727@yahoo.com
+twitter https://twitter.com/Clos27Reyes
+facebook https://www.facebook.com/clos27reyes/?ref=bookmarks
+youtube channel https://www.youtube.com/watch?v=E4SP2A27sns&t=425s
+*/
+//this sketch has 12 inputs and joystick function on analog pin A10. refer to board info to locate A10
+// this sketch was designed to work on pro micro compatible board.
+// this sketch was created and designed for hydraulic e-brake diy build for sim racing both console and pc
+//all inputs have hold down function. 
+
+#include <Joystick.h>
+#include <Keyboard.h>
+#include <Keypad.h>
+const byte ROWS = 3; // Five rows //25 Buttons
+const byte COLS = 4; // Five columns
+// Define the Keys
+char hexaKeys[ROWS][COLS] = {
+ {'2','7','8','9',}, // button connected to pin 3
+ {'y','z','0','1',}, //Button connnected to pin 4
+ {'3','4','5','6',}, //Button connnected to PIN 5
+//PIN: 7 14, 15, 16
+ /* NOTE PIN 3 INPUTS IS DESIGNATED PIN SOLELY FOR THE SEQUITIAL SHIFTER
+ * AND E-BRAKE DO NOT USE THESE FOR BUTTONS.
+ * THESE INPUTS ARE TO BE CONNECTED TO 2 AVIATOR PLUGS
+ * ONE BEING A 2 PIN AND THE OTHER A 4 PIN
+ * PIN 3,7, 14,AND 15 GO GONNECTED TO THE 4 PIN AVIATOR FEMALE END PLUG
+ * IN SEQUNTIAL ORDER
+ * 4 PIN AVIATION PLUG CONNECTIONS
+ * PIN 3 FROM PRO MICRO CONNECTS TO PIN 1 THIS ACTS LIKE THE COMMON FOR
+ALL INPUTS
+ * PIN 7 FROM PRO MICRO CONNECTS TO PIN 2 INPUT = 2
+ * PIN 14 FROM PRO MICRO CONNECTS TO PIN 3 INPUT = 7
+ * PIN 15 FROM PRO MICRO CONNECTS TO PIN 4 INPUT = 8
+ * 2 PIN AVIATION PLUG CONNECTION
+ * PIN 3 FROM PRO MICRO CONNECTS TO PIN 1
+ * PIN 15 FROM PRO MICRO CONNECTS TO PIN 2 INPUT = 9
+ *
+ * WHEN WIRING SWITCHES TO YOUR SEQUENTIAL SHIFTER.
+ * WIRE BOTH COMMON PINS ON SWITCH AND CONNECT THEM TO PIN 1 FMALE END
+AVIATION PLUG
+ * THE REST OF THE PINS ON MALE AVIATION PLUG CAN BE WIRED RANDOMLY.
+*/
+};
+byte rowPins[ROWS] = {3,4,5,};
+byte colPins[COLS] = {7,14,15,16,};
+// Create the Keypad
+Keypad button = Keypad( makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS );
+/*#define ledpinA0 A0
+#define ledpinA1 A1
+#define ledpinA2 A2
+#define ledpinA3 A3
+#define ledpinA7 A7
+#define ledpinA8 A8
+#define ledpinA9 A9
+//#define ledpinA10 A10
+boolean blink = false;
+boolean ebrake = false;
+boolean horn = false;
+boolean misc1 = false;
+boolean misc2 = false;
+boolean misc3 = false;
+boolean misc4 = false;
+boolean misc5 = false;
+boolean misc6 = false;
+boolean ambiente = false;
+/*boolean ledpinA0_state;
+boolean ledpinA1_state;
+boolean ledpinA2_state;
+boolean ledpinA3_state;
+boolean ledpinA7_state;
+boolean ledpinA8_state;
+boolean ledpinA9_state;
+//boolean ledpinA10_state;*/
+
+unsigned long loopCount;
+unsigned long startTime;
+String msg;
+void setup()
+{
+  // Initialize Button Pins
+  pinMode(A10, INPUT);
+ 
+
+  // Initialize Joystick Library
+  Joystick.begin();
+// Initialize Button Pins
+  pinMode(A10, INPUT);
+ 
+// Constant that maps the phyical pin to the joystick button.
+const int pinToButtonMap = A10;
+  
+  
+ //pinMode(ledpinA0,OUTPUT);
+ pinMode(ledpinA1,OUTPUT);
+ pinMode(ledpinA2,OUTPUT);
+ pinMode(ledpinA3,OUTPUT);
+ pinMode(ledpinA7,OUTPUT);
+ pinMode(ledpinA8,OUTPUT);
+ pinMode(ledpinA9,OUTPUT);
+// pinMode(ledpinA10,OUTPUT);
+ analogWrite(ledpinA0,128);
+ analogWrite(ledpinA1,128);
+ analogWrite(ledpinA2,128);
+ analogWrite(ledpinA3,128);
+ analogWrite(ledpinA7,128);
+ analogWrite(ledpinA8,128);
+ analogWrite(ledpinA9,128);
+ //analogWrite(ledpinA10,128);
+ //
+ digitalWrite(ledpinA1, HIGH);
+ digitalWrite(ledpinA2, HIGH);
+ digitalWrite(ledpinA3, HIGH);
+ digitalWrite(ledpinA0, HIGH);
+ digitalWrite(ledpinA8, HIGH);
+ digitalWrite(ledpinA9, HIGH);
+ delay(300);
+ digitalWrite(ledpinA1, LOW);
+ digitalWrite(ledpinA2, LOW);
+ digitalWrite(ledpinA3, LOW);
+ digitalWrite(ledpinA0, LOW);
+ digitalWrite(ledpinA8, LOW);
+ digitalWrite(ledpinA9, LOW);
+ delay(300);
+ digitalWrite(ledpinA1, HIGH);
+ digitalWrite(ledpinA2, HIGH);
+ digitalWrite(ledpinA3, HIGH);
+ digitalWrite(ledpinA0, HIGH);
+ digitalWrite(ledpinA8, HIGH);
+ digitalWrite(ledpinA9, HIGH);
+ delay(300);
+ digitalWrite(ledpinA1, LOW);
+ digitalWrite(ledpinA2, LOW);
+ digitalWrite(ledpinA3, LOW);
+ digitalWrite(ledpinA0, LOW);
+ digitalWrite(ledpinA9, LOW);
+ digitalWrite(ledpinA8, LOW);
+ delay(300);
+ digitalWrite(ledpinA8, HIGH);
+ delay(250);
+ digitalWrite(ledpinA9, HIGH);
+ delay(250);
+ digitalWrite(ledpinA2, HIGH);
+ delay(250);
+ digitalWrite(ledpinA3, HIGH);
+ delay(250);
+ digitalWrite(ledpinA0, HIGH);
+ delay(250);
+ digitalWrite(ledpinA1, HIGH);
+ delay(250);
+ digitalWrite(ledpinA1, LOW);
+ digitalWrite(ledpinA2, LOW);
+ digitalWrite(ledpinA3, LOW);
+ digitalWrite(ledpinA0, LOW);
+ digitalWrite(ledpinA8, LOW);
+ digitalWrite(ledpinA9, LOW);
+ delay(300);
+ digitalWrite(ledpinA1, HIGH);
+ digitalWrite(ledpinA2, HIGH);
+ digitalWrite(ledpinA3, HIGH);
+ digitalWrite(ledpinA0, HIGH);
+ digitalWrite(ledpinA8, HIGH);
+ digitalWrite(ledpinA9, HIGH);
+ delay(300);
+ digitalWrite(ledpinA1, LOW);
+ digitalWrite(ledpinA2, LOW);
+ digitalWrite(ledpinA3, LOW);
+ digitalWrite(ledpinA0, LOW);
+ digitalWrite(ledpinA9, LOW);
+ digitalWrite(ledpinA8, LOW);
+ Serial.begin(9600);
+ loopCount = 0;
+ startTime = millis();
+ msg = "";
+ ledpinA0_state = digitalRead(ledpinA0);
+ ledpinA1_state = digitalRead(ledpinA1);
+ ledpinA2_state = digitalRead(ledpinA2);
+ ledpinA3_state = digitalRead(ledpinA3);
+ ledpinA7_state = digitalRead(ledpinA7);
+ ledpinA8_state = digitalRead(ledpinA8);
+ ledpinA9_state = digitalRead(ledpinA9);
+ //ledpinA10_state = digitalRead(ledpinA10);
+ button.addEventListener(keypadEvent);
+ button.setHoldTime(10);
+}
+void loop()
+{
+
+  int pot = analogRead(A10);
+    int mapped = map(pot,0,255,0,255);//(pot,0,1023,0,255);
+
+        {
+      Joystick.setThrottle(mapped);
+      
+    }
+ 
+ loopCount++;
+ if ( (millis()-startTime)>5000 ) {
+ Serial.print("Average loops per second = ");
+ Serial.println(loopCount/5);
+ startTime = millis();
+ loopCount = 0;
+ }
+ // Fills customKeypad.key[ ] array with up-to 10 active keys.
+ // Returns true if there are ANY active keys.
+ if (button.getKeys())
+ {
+ for (int i=0; i<LIST_MAX; i++) // Scan the whole key list.
+ {
+ if ( button.key[i].stateChanged ) // Only find keys that have changed state.
+ {
+ switch (button.key[i].kstate) { // Report active key state : IDLE, PRESSED, HOLD, or
+//RELEASED
+ case PRESSED:
+ msg = " PRESSED.";
+ break;
+ case HOLD:
+ msg = " HOLD.";
+ break;
+ case RELEASED:
+ msg = " RELEASED.";
+ break;
+ case IDLE:
+ msg = " IDLE.";
+ }
+ Serial.print("Key ");
+ Serial.print(button.key[i].kchar);
+ Serial.println(msg);
+ }
+ }
+ }
+ if (ebrake){ //e-brake hold function
+ Keyboard.press('9');
+ digitalWrite(ledpinA8, HIGH);
+ delay(10);
+ Keyboard.release('9');
+ digitalWrite(ledpinA8, LOW);
+ }
+ if (horn){ //hold for horn function
+ Keyboard.press('5');
+ digitalWrite(ledpinA9, HIGH);
+ delay(50);
+ Keyboard.release('5');
+ digitalWrite(ledpinA9, LOW);
+ }
+ if (misc1){
+ Keyboard.press('4');
+ digitalWrite(ledpinA2, HIGH);
+ delay(350);
+ Keyboard.release('4');
+ digitalWrite(ledpinA2, LOW);
+ }
+ if (misc2){
+ Keyboard.press('0');
+ digitalWrite(ledpinA0, HIGH);
+ delay(350);
+ Keyboard.release('0');
+ digitalWrite(ledpinA0, LOW);
+ }
+ if (misc3) {
+ Keyboard.press('y');
+ digitalWrite(ledpinA0, HIGH);
+ delay(350);
+ Keyboard.release('y');
+ digitalWrite(ledpinA0, LOW);
+ }
+ if (misc4) {
+ Keyboard.press('1');
+ digitalWrite(ledpinA1,HIGH);
+ delay(350);
+ Keyboard.release('1');
+ digitalWrite(ledpinA1,LOW);
+ }
+ if (misc5) {
+ Keyboard.press('z');
+ digitalWrite(ledpinA1,HIGH);
+ delay(350);
+ Keyboard.release('z');
+ digitalWrite(ledpinA1,LOW);
+ }
+ }
+void keypadEvent(KeypadEvent key){
+ switch (button.getState()){
+ case PRESSED:
+ if (key == 'y') {
+ Keyboard.press(key);
+ delay(50);
+ Keyboard.release(key);
+ }
+ if (key == 'z') {
+ Keyboard.press(key);
+ delay(50);
+ Keyboard.release(key);
+ }
+ if (key == '0') {
+ Keyboard.press(key);
+ delay(50);
+ Keyboard.release(key);
+ }
+ if (key == '1') {
+ Keyboard.press(key);
+ delay(50);
+ Keyboard.release(key);
+ }
+ if (key == '2') {
+ Keyboard.press(key);
+ digitalWrite(ledpinA3,HIGH);
+ delay(50);
+ Keyboard.release(key);
+ digitalWrite(ledpinA3,LOW);
+ }
+ if (key == '4') {
+ Keyboard.press(key);
+ delay(50);
+ Keyboard.release(key);
+ }
+ if (key == '5') {
+ Keyboard.press(key);
+ delay(50);
+ Keyboard.release(key);
+ }
+ if (key == '7') {
+ Keyboard.press(key);
+ digitalWrite(ledpinA3,HIGH);
+ delay(50);
+ Keyboard.release(key);
+ digitalWrite(ledpinA3,LOW);
+ }
+ if (key == '8') {
+ Keyboard.press(key);
+ digitalWrite(ledpinA3,HIGH);
+ delay(50);
+ Keyboard.release(key);
+ digitalWrite(ledpinA3,LOW);
+ }
+ if (key == '9') {
+ Keyboard.press(key);
+ delay(10);
+ Keyboard.release(key);
+ }
+ break;
+ case HOLD:
+ if (key == '9') {
+ ebrake = true;
+ }
+ if (key == '5') {
+ horn = true;
+ }
+ if (key == '4') {
+ }
+ if (key == '0') {
+ misc2 = true;
+ }
+ if (key == 'y') {
+ misc3 = true;
+ }
+ if (key == '1') {
+ misc4 = true;
+ }
+ if (key == 'z') {
+ }
+ break;
+ case RELEASED:
+ if (key == '9') {
+ ebrake = false;
+ }
+ if (key == '5') {
+ horn = false;
+ }
+ if (key == '4') {
+ misc1 = false;
+ }
+ if (key == '0') {
+ misc2 = false;
+ }
+ if (key == 'y') {
+ misc3 = false;
+ }
+ if (key == '1') {
+ misc4 = false;
+ }
+ if (key == 'z') {
+ misc5 = false;
+ }
+ break;
+ }
+}
+
+      
+// end code
